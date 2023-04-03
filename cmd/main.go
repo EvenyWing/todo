@@ -19,7 +19,7 @@ func main() {
 		panic("failed to connect database")
 	}
 
-	migrate := flag.Bool("migrate db", false, "migrate db to todolist")
+	migrate := flag.Bool("migrate", false, "migrate db to todolist")
 	flag.Parse()
 	if *migrate == true {
 		err := db.AutoMigrate(&model.ModelTodo{})
@@ -31,14 +31,17 @@ func main() {
 		}
 
 		fmt.Println("DB as succefully migrate")
+		return
 	}
 
 	c := controller.NewTodoController(db)
 	h := handler.NewTodoHandler(c)
 	r := gin.Default()
-	r.GET("/todos/:owner", h.db.GetTodo())
-	r.GET("/todo/:id", h.db.GetTodoByID())
-	r.POST("/todo", h.db.CreateTodo())
-	r.PUT("/todo", h.db.UpdeateTodo())
-	r.DELETE("/todo/:id", h.db.DeleteTodo())
+	r.GET("/todos/:owner", h.GetTodo())
+	r.GET("/todo/:id", h.GetTodoByID())
+	r.POST("/todo", h.CreateTodo())
+	r.PUT("/todo", h.UpdeateTodo())
+	r.DELETE("/todo/:id", h.DeleteTodo())
+
+	r.Run()
 }
